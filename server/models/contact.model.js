@@ -1,7 +1,10 @@
 import mongoose from 'mongoose';
 const ContactSchema = new mongoose.Schema({
-  firstname: { type: String, required: true },
-  lastname: { type: String, required: true },
-  email: { type: String, required: true }
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
+  email: { type: String, required: true, trim: true },
+  contactNumber: { type: String, required: true, trim: true },
+  message: { type: String, required: true, trim: true },
+  created: { type: Date, default: Date.now }
 });
 export default mongoose.model('Contact', ContactSchema);

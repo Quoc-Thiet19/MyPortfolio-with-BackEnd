@@ -1,4 +1,3 @@
-import React from 'react';
 import profileImage from './assets/profile.jpg';
 /**
  * About Component
@@ -14,33 +13,18 @@ export default function About() {
             
             <div style={{ display: 'flex', gap: '30px', alignItems: 'center', margin: '25px 0', flexWrap: 'wrap' }}>
                 {/* Assignment Requirement: Personal Profile Image Placeholder Grid */}
-                <div style={{ 
-                    width: '140px', 
-                    height: '140px', 
-                    borderRadius: '50%', 
-                    background: 'var(--code-bg)', 
-                    border: '2px dashed var(--accent)', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    fontSize: '13px',
-                    color: 'var(--text)'
-                }}>
-                <div>
-                    <img 
-                        src={profileImage} 
-                        alt="John Doe Profile Headshot" 
-                        style={{ 
-                            width: '140px', 
-                            height: '140px', 
-                            borderRadius: '50%',               
-                            objectFit: 'cover',                
-                            border: '3px solid var(--accent)', 
-                            boxShadow: 'var(--shadow)'        
-                        }} 
-                    />
-                </div>
-                </div>
+                <img
+                    src={profileImage}
+                    alt="Quoc Thiet Pham profile"
+                    style={{
+                        width: '140px',
+                        height: '140px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        border: '3px solid var(--text-h)',
+                        boxShadow: 'var(--shadow)'
+                    }}
+                />
                 
                 <p style={{ fontSize: '17px', lineHeight: '1.6', flex: '1', minWidth: '280px', margin: 0 }}>
                     I am a dedicated Web Application Developer pursuing cutting-edge certifications in reactive script compiling. 

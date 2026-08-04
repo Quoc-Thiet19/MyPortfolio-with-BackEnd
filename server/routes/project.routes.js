@@ -6,12 +6,12 @@ const router = express.Router();
 
 router.route('/api/projects')
   .get(projectCtrl.list)
-  .post(projectCtrl.create)
-  .delete(projectCtrl.removeAll);
+  .post(authCtrl.requireSignin, authCtrl.isAdmin, projectCtrl.create)
+  .delete(authCtrl.requireSignin, authCtrl.isAdmin, projectCtrl.removeAll);
 
 router.route('/api/projects/:id')
   .get(projectCtrl.read)
-  .put(projectCtrl.update)
-  .delete(projectCtrl.remove);
+  .put(authCtrl.requireSignin, authCtrl.isAdmin, projectCtrl.update)
+  .delete(authCtrl.requireSignin, authCtrl.isAdmin, projectCtrl.remove);
 
 export default router;

@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import extend from "lodash/extend.js";
 import errorHandler from "../helpers/dbErrorHandler.js"; 
 const create = async (req, res) => {
-  const user = new User(req.body);
+  const user = new User({ ...req.body, role: 'user' });
   try {
     await user.save();
     return res.status(200).json({
@@ -17,7 +17,7 @@ const create = async (req, res) => {
 
 const list = async (req, res) => {
   try {
-    let users = await User.find().select("name email updated created");
+    let users = await User.find().select("name email role updated created");
     return res.json(users);
   } catch (err) {
     return res.status(400).json({
@@ -52,7 +52,8 @@ const read = (req, res) => {
 const update = async (req, res) => {
   try {
     let user = req.profile;
-    user = extend(user, req.body); 
+    const { role, hashed_password, salt, ...safeUpdates } = req.body;
+    user = extend(user, safeUpdates);
     user.updated = Date.now();
     await user.save();
     

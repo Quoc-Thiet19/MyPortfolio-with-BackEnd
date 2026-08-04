@@ -14,6 +14,11 @@ const UserSchema = new mongoose.Schema({
     match: [/.+\@.+\..+/, 'Please fill a valid email address'],
     required: 'Email is required'
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  },
   created: {
     type: Date,
     default: Date.now
@@ -34,7 +39,6 @@ UserSchema.virtual('password')
     this._password = password;
     this.salt = this.makeSalt();
     this.hashed_password = this.encryptPassword(password);
-    //this.hashed_password = password;
   })
   .get(function() {
     return this._password;
@@ -69,31 +73,4 @@ UserSchema.methods = {
   }
 }
 
-//module.exports = mongoose.model('User', UserSchema);
 export default mongoose.model('User', UserSchema);
-
-
-/*const mongoose = require("mongoose");
-const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: "Name is required",
-  },
-  email: {
-    type: String,
-    trim: true,
-    unique: "Email already exists",
-    match: [/.+\@.+\..+/, "Please fill a valid email address"],
-    required: "Email is required",
-  },
-  created: {
-    type: Date,
-    default: Date.now,
-  },
-  updated: {
-    type: Date,
-    default: Date.now,
-  },
-});
-*/

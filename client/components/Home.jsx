@@ -1,5 +1,3 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
 
 /**
  * Home Component
@@ -26,15 +24,6 @@ export default function Home() {
                 </p>
             </div>
 
-            {/* Assignment Requirement: Navigation redirect bypass buttons to child pages */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '30px' }}>
-                <Link to="/about" className="counter" style={{ textDecoration: 'none', display: 'inline-block' }}>
-                    More About Me
-                </Link>
-                <Link to="/project" className="counter" style={{ textDecoration: 'none', display: 'inline-block' }}>
-                    View My Portfolios
-                </Link>
-            </div>
         </div>
     );
 }

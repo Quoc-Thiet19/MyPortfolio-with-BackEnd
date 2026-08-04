@@ -1,105 +1,75 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { api } from './lib/api'
+import { useAuth } from './context/useAuth'
 
-/**
- * Contact Component
- * Handles real-time field change syncs and routes context states back to home views upon post submission intercepts.
- */
+const blankContact = { firstName: '', lastName: '', contactNumber: '', email: '', message: '' }
+
 export default function Contact() {
-    const navigate = useNavigate();
-    
-    // Assignment Requirement: Capturing explicitly First Name, Last Name, Contact Number, Email Address, and Message
-    const [fields, setFields] = useState({
-        firstName: '',
-        lastName: '',
-        contactNumber: '',
-        email: '',
-        message: ''
-    });
+  const { session, isAdmin } = useAuth()
+  const [values, setValues] = useState(blankContact)
+  const [contacts, setContacts] = useState([])
+  const [editingId, setEditingId] = useState(null)
+  const [status, setStatus] = useState('')
+  const [error, setError] = useState('')
 
-    // Update form properties within internal field synchronization buffers
-    const handleSync = (e) => {
-        setFields({ ...fields, [e.target.name]: e.target.value });
-    };
+  const loadContacts = async () => {
+    if (!isAdmin) return
+    try { setContacts(await api('/api/contacts', { token: session.token })) } catch (err) { setError(err.message) }
+  }
 
-    // Process submission data and execute view state routing
-    const handleSubmitAction = (e) => {
-        e.preventDefault();
-        
-        // Output tracing logs to fulfill diagnostic operational rules
-        console.log("Captured Metadata Packets:", fields);
-        
-        // Assignment Requirement: Redirect the application view state directly back to the Home page
-        navigate("/");
-    };
+  useEffect(() => {
+    if (!isAdmin) return undefined
+    let active = true
+    api('/api/contacts', { token: session.token })
+      .then((data) => { if (active) setContacts(data) })
+      .catch((err) => { if (active) setError(err.message) })
+    return () => { active = false }
+  }, [isAdmin, session?.token])
 
-    return (
-        <div style={{ maxWidth: '520px', margin: '0 auto', textAlign: 'left', padding: '0 20px', width: '100%' }}>
-            <h1>Contact Me</h1>
-            <p style={{ color: 'var(--text)' }}>Fill out the required verification inputs below to broadcast formal communication hooks.</p>
+  const submit = async (event) => {
+    event.preventDefault()
+    try {
+      const path = editingId ? `/api/contacts/${editingId}` : '/api/contacts'
+      await api(path, { method: editingId ? 'PUT' : 'POST', token: session?.token, body: JSON.stringify(values) })
+      setStatus(editingId ? 'Message updated.' : 'Thank you. Your message has been sent successfully.')
+      setValues(blankContact); setEditingId(null); await loadContacts()
+    } catch (err) { setError(err.message) }
+  }
 
-            <div style={{ 
-                background: 'var(--code-bg)', 
-                padding: '20px', 
-                borderRadius: '8px', 
-                border: '1px solid var(--border)',
-                marginTop: '20px',
-                marginBottom: '25px',
-                fontSize: '15px',
-                lineHeight: '1.6'
-            }}>
-                <h3 style={{ marginTop: 0, marginBottom: '15px', color: 'var(--text-h)' }}>My Direct Contact</h3>
-                <div style={{ marginBottom: '8px' }}>
-                    <strong>📍 Address:</strong> Toronto, Ontario, Canada
-                </div>
-                <div style={{ marginBottom: '8px' }}>
-                    <strong>📧 Email:</strong> <a href="mailto:alex.pham@gmail.com" style={{ color: 'var(--accent)', textDecoration: 'none' }}>alex.pham@gmail.com</a>
-                </div>
-                <div style={{ marginBottom: '8px' }}>
-                    <strong>📞 Phone:</strong> +1 416 123 4567
-                </div>
-                <div>
-                    <strong>🌐 GitHub:</strong> <a href="https://github.com/Quoc-Thiet19" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none' }}>github.com/Quoc-Thiet19</a>
-                </div>
-            </div>
+  const edit = (contact) => { setEditingId(contact._id); setValues(Object.fromEntries(Object.keys(blankContact).map((key) => [key, contact[key] || '']))); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+  const remove = async (id) => {
+    if (!window.confirm('Delete this message?')) return
+    try { await api(`/api/contacts/${id}`, { method: 'DELETE', token: session.token }); setStatus('Message deleted.'); await loadContacts() } catch (err) { setError(err.message) }
+  }
 
-            <form onSubmit={handleSubmitAction} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '25px' }}>
-                
-                {/* Dual Column Configuration for Names */}
-                <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: '120px' }}>
-                        <label style={{ fontWeight: '500', fontSize: '15px' }}>First Name:</label>
-                        <input type="text" name="firstName" value={fields.firstName} onChange={handleSync} style={{ padding: '10px', border: '1px solid var(--border)', borderRadius: '5px' }} required />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1, minWidth: '120px' }}>
-                        <label style={{ fontWeight: '500', fontSize: '15px' }}>Last Name:</label>
-                        <input type="text" name="lastName" value={fields.lastName} onChange={handleSync} style={{ padding: '10px', border: '1px solid var(--border)', borderRadius: '5px' }} required />
-                    </div>
-                </div>
+  return <main className="page contact-page">
+    <section className="contact-intro">
+      <p className="eyebrow">GET IN TOUCH</p>
+      <h1>Let's build something great.</h1>
+      <p>I'm always open to discussing web development projects, internships, and new opportunities.</p>
+      <div className="contact-details">
+        <a href="mailto:alex.pham@gmail.com"><span>Email</span>alex.pham@gmail.com</a>
+        <a href="tel:+14161234567"><span>Phone</span>+1 416 123 4567</a>
+        <a href="https://github.com/Quoc-Thiet19" target="_blank" rel="noreferrer"><span>GitHub</span>github.com/Quoc-Thiet19</a>
+      </div>
+    </section>
 
-                {/* Mandated Field: Contact Number */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <label style={{ fontWeight: '500', fontSize: '15px' }}>Contact Number:</label>
-                    <input type="tel" name="contactNumber" value={fields.contactNumber} onChange={handleSync} style={{ padding: '10px', border: '1px solid var(--border)', borderRadius: '5px' }} required />
-                </div>
-                
-                {/* Mandated Field: Email Address */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <label style={{ fontWeight: '500', fontSize: '15px' }}>Email Address:</label>
-                    <input type="email" name="email" value={fields.email} onChange={handleSync} style={{ padding: '10px', border: '1px solid var(--border)', borderRadius: '5px' }} required />
-                </div>
-                
-                {/* Mandated Field: Message Body */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <label style={{ fontWeight: '500', fontSize: '15px' }}>Message:</label>
-                    <textarea name="message" rows="5" value={fields.message} onChange={handleSync} style={{ padding: '10px', border: '1px solid var(--border)', borderRadius: '5px', fontFamily: 'inherit' }} required />
-                </div>
-
-                {/* Action Submit Wrapper Leveraging Global Theme Styles */}
-                <button type="submit" className="counter" style={{ cursor: 'pointer', alignSelf: 'flex-start', padding: '10px 25px', marginTop: '5px' }}>
-                    Submit Inquiry
-                </button>
-            </form>
+    <section className="contact-form-wrap">
+      <h2>{editingId ? 'Edit message' : 'Send a message'}</h2>
+      {error && <p className="message error">{error}</p>}
+      {status && <p className="message success">{status}</p>}
+      <form className="form-card" onSubmit={submit}>
+        <div className="form-row">
+          <label>First name<input required value={values.firstName} onChange={(e) => setValues({ ...values, firstName: e.target.value })} /></label>
+          <label>Last name<input required value={values.lastName} onChange={(e) => setValues({ ...values, lastName: e.target.value })} /></label>
         </div>
-    );
+        <label>Email<input required type="email" value={values.email} onChange={(e) => setValues({ ...values, email: e.target.value })} /></label>
+        <label>Phone number<input required type="tel" value={values.contactNumber} onChange={(e) => setValues({ ...values, contactNumber: e.target.value })} /></label>
+        <label>Message<textarea required rows="5" value={values.message} onChange={(e) => setValues({ ...values, message: e.target.value })} /></label>
+        <div className="actions"><button type="submit">{editingId ? 'Save changes' : 'Send message'}</button>{editingId && <button type="button" className="secondary" onClick={() => { setEditingId(null); setValues(blankContact) }}>Cancel</button>}</div>
+      </form>
+    </section>
+
+    {isAdmin && <section className="admin-messages"><h2>Received messages</h2>{contacts.length ? <div className="cards">{contacts.map((contact) => <article className="card" key={contact._id}><h3>{contact.firstName} {contact.lastName}</h3><p><a href={`mailto:${contact.email}`}>{contact.email}</a> · {contact.contactNumber}</p><p>{contact.message}</p><div className="actions"><button type="button" className="secondary" onClick={() => edit(contact)}>Edit</button><button type="button" className="danger" onClick={() => remove(contact._id)}>Delete</button></div></article>)}</div> : <p>No messages yet.</p>}</section>}
+  </main>
 }

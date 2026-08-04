@@ -1,51 +1,38 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import logoImage from '../src/assets/logo.png'; 
+import { NavLink } from 'react-router-dom'
+import logoImage from '../src/assets/logo.png'
+import { useAuth } from '../src/context/useAuth'
 
-/**
- * Layout Component
- * Manages standard responsive text logo positioning and global client navigation bars.
- */
+const navItems = [
+  { to: '/', label: 'Home' },
+  { to: '/about', label: 'About' },
+  { to: '/education', label: 'Education' },
+  { to: '/project', label: 'Projects' },
+  { to: '/contact', label: 'Contact' },
+]
+
 export default function Layout() {
-    return (
-        <div style={{ padding: '20px 0', textAlign: 'center' }}>
-            <div style={{ marginBottom: '15px' }}>
-                <Link to="/">
-                    <img 
-                        src={logoImage} 
-                        alt="My Portfolio Logo" 
-                        style={{ 
-                            height: '90px',       
-                            width: 'auto',        
-                            objectFit: 'contain'  
-                        }} 
-                    />
-                </Link>
-            </div>
-            {/* Assignment Requirement: Custom Logo using a stylized color-filled primitive shape */}
-            <div style={{ 
-                display: 'inline-block', 
-                padding: '8px 20px', 
-                background: 'var(--accent-bg)', 
-                border: '2px solid var(--accent)', 
-                borderRadius: '8px', 
-                fontWeight: 'bold', 
-                color: 'var(--accent)',
-                letterSpacing: '1px',
-                marginBottom: '15px' 
-            }}>
-                Quoc Thiet Pham | PORTFOLIO
-            </div>
-            
-            {/* Global Navigation scheme allowing frictionless view state traversal */}
-            <nav style={{ display: 'flex', justifyContent: 'center', gap: '25px', marginBottom: '15px' }}>
-                <Link to="/" style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: '500' }}>Home</Link>
-                <Link to="/about" style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: '500' }}>About Me</Link>
-                <Link to="/education" style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: '500' }}>Education</Link>
-                <Link to="/project" style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: '500' }}>Projects</Link>
-                <Link to="/contact" style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: '500' }}>Contact Me</Link>
-            </nav>
-            <hr style={{ border: '0', borderTop: '1px solid var(--border)', marginBottom: '30px' }} />
-        </div>
-    );
+  const { session, signOut, isAdmin } = useAuth()
+
+  return <header className="site-header">
+    <div className="header-inner">
+      <NavLink to="/" className="brand" aria-label="Quoc Thiet Pham home">
+        <img src={logoImage} alt="Quoc Thiet Pham logo" className="brand-logo" />
+        <span className="brand-copy"><strong>Quoc Thiet Pham</strong><small>Software Engineering Student</small></span>
+      </NavLink>
+
+      <nav className="main-nav" aria-label="Main navigation">
+        {navItems.map(({ to, label }) => <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>{label}</NavLink>)}
+      </nav>
+
+      <div className="header-account">
+        {isAdmin && <NavLink to="/admin" className="nav-link">Administration</NavLink>}
+        {session ? <button type="button" className="account-button" onClick={signOut}>
+          Sign out &middot; <strong>{isAdmin ? 'Admin' : session.user.name}</strong>
+        </button> : <>
+          <NavLink to="/signin" className="nav-link">Sign in</NavLink>
+          <NavLink to="/signup" className="signup-button">Sign up</NavLink>
+        </>}
+      </div>
+    </div>
+  </header>
 }
