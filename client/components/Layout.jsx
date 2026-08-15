@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import logoImage from '../src/assets/logo.png'
+import logoImage from '../src/assets/logo-optimized.jpg'
 import { useAuth } from '../src/context/useAuth'
 
 const navItems = [
@@ -16,7 +16,7 @@ export default function Layout() {
   return <header className="site-header">
     <div className="header-inner">
       <NavLink to="/" className="brand" aria-label="Quoc Thiet Pham home">
-        <img src={logoImage} alt="Quoc Thiet Pham logo" className="brand-logo" />
+        <img src={logoImage} alt="Quoc Thiet Pham logo" className="brand-logo" width="42" height="42" decoding="async" fetchPriority="high" />
         <span className="brand-copy"><strong>Quoc Thiet Pham</strong><small>Software Engineering Student</small></span>
       </NavLink>
 

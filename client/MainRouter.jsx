@@ -1,20 +1,22 @@
+import { lazy, Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import Home from './components/Home'
-import About from './src/about'
-import Contact from './src/contact'
-import Education from './src/education'
-import Project from './src/project'
 import Layout from './components/Layout'
-import Signin from './src/signin'
-import Signup from './src/signup'
-import AdminDashboard from './src/admin'
 
+const About = lazy(() => import('./src/about'))
+const Contact = lazy(() => import('./src/contact'))
+const Education = lazy(() => import('./src/education'))
+const Project = lazy(() => import('./src/project'))
+const Signin = lazy(() => import('./src/signin'))
+const Signup = lazy(() => import('./src/signup'))
+const AdminDashboard = lazy(() => import('./src/admin'))
 
 const MainRouter = () => {
  return (<div>
      <Layout/>
 
-        <Routes>
+        <Suspense fallback={<main className="page"><p>Loading page...</p></main>}>
+          <Routes>
             <Route exact path="/" element={<Home />} />
             <Route exact path="/about" element={<About />} />
             <Route exact path="/education" element={<Education />} />
@@ -23,7 +25,8 @@ const MainRouter = () => {
             <Route path="/signin" element={<Signin />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/admin" element={<AdminDashboard />} />
-        </Routes>
+          </Routes>
+        </Suspense>
         </div>
     )
 }

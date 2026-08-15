@@ -16,6 +16,10 @@ export default function About() {
                 <img
                     src={profileImage}
                     alt="Quoc Thiet Pham profile"
+                    width="140"
+                    height="140"
+                    loading="lazy"
+                    decoding="async"
                     style={{
                         width: '140px',
                         height: '140px',
