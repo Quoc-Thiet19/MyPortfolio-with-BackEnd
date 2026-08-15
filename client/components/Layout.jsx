@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import logoImage from '../src/assets/logo-optimized.jpg'
+import logoImage from '../src/assets/new_jdm_logo.png'
 import { useAuth } from '../src/context/useAuth'
 
 const navItems = [
